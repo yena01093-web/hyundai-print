@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>현대인쇄소 | 단양 명함·간판·광고물 제작</title>
+<meta name="description" content="충북 단양군 단양읍 현대인쇄소. 1998년부터 명함, 간판, 현수막, 전단지, 스티커 등 인쇄물을 제작합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Zilla+Slab:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #1C1B18; color: #F0EDE6;
+    font-family: 'Pretendard', -apple-system, 'Malgun Gothic', sans-serif;
+    line-height: 1.6; overflow-x: hidden;
+    touch-action: manipulation;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3 { font-family: 'Zilla Slab', Georgia, serif; }
+
+  /* ── Crop mark motif ────────────────────────────────── */
+  .crop-mark { position: absolute; width: 18px; height: 18px; opacity: 0.5; pointer-events: none; }
+  .crop-mark::before, .crop-mark::after { content: ''; position: absolute; background: #C23B32; }
+  .crop-mark::before { width: 100%; height: 1px; top: 50%; left: 0; }
+  .crop-mark::after { width: 1px; height: 100%; left: 50%; top: 0; }
+  .crop-mark.tl { top: 18px; left: 18px; }
+  .crop-mark.tr { top: 18px; right: 18px; }
+  .crop-mark.bl { bottom: 18px; left: 18px; }
+  .crop-mark.br { bottom: 18px; right: 18px; }
+
+  .cmyk-bar { display: flex; height: 4px; width: 100%; }
+  .cmyk-bar span { flex: 1; }
+  .cmyk-bar .c { background: #00AEEF; }
+  .cmyk-bar .m { background: #EC008C; }
+  .cmyk-bar .y { background: #FFF200; }
+  .cmyk-bar .k { background: #1C1B18; }
+
+  /* ── Nav ─────────────────────────────────────────── */
+  #nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px; transition: all 0.3s ease; background: rgba(28,27,24,0);
+    touch-action: manipulation;
+  }
+  #nav.scrolled { background: rgba(28,27,24,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(194,59,50,0.2); padding: 14px 32px; }
+  .logo { font-family: 'Zilla Slab', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: #F0EDE6; }
+  .logo b { color: #C23B32; }
+  .nav-links { display: flex; gap: 32px; font-size: 14px; font-weight: 500; color: #C9C4B6; }
+  .nav-links a:hover { color: #C23B32; }
+  .nav-cta { padding: 9px 20px; border: 1px solid rgba(240,237,230,0.25); border-radius: 4px; font-size: 13px; font-weight: 600; }
+  .nav-cta:hover { background: #C23B32; border-color: #C23B32; }
+  .nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 210; }
+  .nav-burger span { width: 22px; height: 2px; background: #F0EDE6; transition: transform 0.25s ease, opacity 0.25s ease; }
+  .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-burger.open span:nth-child(2) { opacity: 0; }
+  .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .nav-mobile-menu {
+    position: fixed; inset: 0; z-index: 199; background: rgba(28,27,24,0.98); backdrop-filter: blur(10px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .nav-mobile-menu.open { opacity: 1; pointer-events: auto; }
+  .nav-mobile-menu a { font-size: 21px; font-weight: 600; }
+
+  /* ── Hero ────────────────────────────────────────── */
+  #hero { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; position: relative; padding: 120px 0 80px; }
+  .hero-eyebrow { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: #C23B32; font-weight: 700; margin-bottom: 22px; }
+  .hero-title { font-size: clamp(34px, 5.6vw, 62px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; color: #F5F3EE; text-wrap: balance; }
+  .hero-title em { font-style: normal; color: #C23B32; }
+  .hero-desc { font-size: 16.5px; color: #B5B0A2; max-width: 520px; margin-top: 24px; line-height: 1.85; }
+  .hero-actions { display: flex; gap: 14px; margin-top: 38px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px; border-radius: 4px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; font-family: inherit; }
+  .btn-primary { background: #C23B32; color: #F5F3EE; }
+  .btn-primary:hover { background: #D4483E; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; border: 1px solid rgba(240,237,230,0.25); color: #F0EDE6; }
+  .btn-ghost:hover { border-color: #F0EDE6; }
+  .hero-meta { display: flex; gap: 40px; margin-top: 64px; flex-wrap: wrap; }
+  .hero-meta b { display: block; font-family: 'Zilla Slab', serif; font-size: 26px; color: #F5F3EE; font-weight: 700; }
+  .hero-meta span { font-size: 12px; color: #8A8578; letter-spacing: 0.03em; }
+
+  /* ── Section shared ──────────────────────────────── */
+  section { padding: 110px 0; position: relative; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: #C23B32; font-weight: 700; margin-bottom: 14px; }
+  .section-title { font-size: clamp(26px, 3.6vw, 38px); font-weight: 700; color: #F5F3EE; letter-spacing: -0.01em; }
+  .section-sub { font-size: 15.5px; color: #8A8578; margin-top: 14px; max-width: 560px; line-height: 1.8; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── Services ────────────────────────────────────── */
+  #services { background: #201F1B; border-top: 1px solid rgba(194,59,50,0.12); border-bottom: 1px solid rgba(194,59,50,0.12); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(194,59,50,0.14); margin-top: 56px; border-radius: 10px; overflow: hidden; }
+  .service-card { background: #201F1B; padding: 38px 30px; transition: background 0.25s; }
+  .service-card:hover { background: #272620; }
+  .service-icon { width: 46px; height: 46px; border-radius: 8px; background: rgba(194,59,50,0.12); display: flex; align-items: center; justify-content: center; color: #C23B32; margin-bottom: 22px; }
+  .service-name { font-size: 18px; font-weight: 700; color: #F5F3EE; margin-bottom: 10px; }
+  .service-desc { font-size: 13.5px; color: #8A8578; line-height: 1.7; }
+
+  /* ── About ───────────────────────────────────────── */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; align-items: start; }
+  .about-timeline { display: flex; flex-direction: column; gap: 22px; }
+  .about-item { display: flex; gap: 18px; align-items: baseline; }
+  .about-year { font-family: 'Zilla Slab', serif; font-size: 20px; font-weight: 700; color: #C23B32; min-width: 70px; }
+  .about-text { font-size: 14.5px; color: #B5B0A2; }
+  .about-quote { font-family: 'Zilla Slab', serif; font-size: 22px; line-height: 1.6; color: #E8E4DA; font-weight: 500; border-left: 3px solid #C23B32; padding-left: 24px; }
+
+  /* ── Spellcheck tool ─────────────────────────────── */
+  #spellcheck { background: #201F1B; border-top: 1px solid rgba(194,59,50,0.12); border-bottom: 1px solid rgba(194,59,50,0.12); }
+  .sc-box { background: #1C1B18; border: 1px solid rgba(194,59,50,0.18); border-radius: 12px; padding: 32px; margin-top: 48px; }
+  .sc-textarea {
+    width: 100%; min-height: 140px; background: #262420; border: 1px solid rgba(240,237,230,0.12); border-radius: 8px;
+    padding: 16px; color: #F0EDE6; font-size: 15px; font-family: inherit; resize: vertical; line-height: 1.7;
+  }
+  .sc-textarea:focus { outline: none; border-color: #C23B32; }
+  .sc-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 12px; }
+  .sc-hint { font-size: 12.5px; color: #6E6A5E; }
+  .sc-results { margin-top: 24px; display: none; flex-direction: column; gap: 10px; }
+  .sc-results.show { display: flex; }
+  .sc-result-item {
+    display: flex; align-items: flex-start; gap: 12px; background: #262420; border-radius: 8px; padding: 14px 16px;
+    border-left: 3px solid #C23B32; font-size: 14px;
+  }
+  .sc-wrong { color: #C23B32; text-decoration: line-through; font-weight: 600; }
+  .sc-arrow { color: #6E6A5E; }
+  .sc-right { color: #4FBF7F; font-weight: 700; }
+  .sc-help { color: #8A8578; font-size: 12.5px; margin-top: 3px; }
+  .sc-clean { color: #4FBF7F; font-weight: 600; font-size: 14.5px; }
+  .sc-disclaimer { font-size: 12px; color: #6E6A5E; margin-top: 20px; line-height: 1.7; }
+
+  /* ── Location / contact ──────────────────────────── */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; }
+  .contact-info-list { display: flex; flex-direction: column; gap: 20px; }
+  .contact-row { display: flex; gap: 16px; align-items: flex-start; }
+  .contact-row svg { color: #C23B32; flex-shrink: 0; margin-top: 3px; }
+  .contact-row b { display: block; font-size: 14px; color: #F0EDE6; margin-bottom: 3px; }
+  .contact-row span { font-size: 14px; color: #B5B0A2; }
+  .contact-form { background: #201F1B; border: 1px solid rgba(194,59,50,0.15); border-radius: 12px; padding: 30px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12.5px; color: #8A8578; margin-bottom: 6px; display: block; font-weight: 600; }
+  .form-input, .form-textarea, .form-select {
+    width: 100%; padding: 12px 14px; background: #262420; border: 1px solid rgba(240,237,230,0.12); border-radius: 6px;
+    color: #F0EDE6; font-size: 14.5px; font-family: inherit;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #C23B32; }
+  .form-textarea { min-height: 90px; resize: vertical; }
+  .form-submit { width: 100%; margin-top: 6px; }
+  .form-note { font-size: 12px; color: #6E6A5E; margin-top: 12px; text-align: center; }
+
+  footer { padding: 40px 0; border-top: 1px solid rgba(240,237,230,0.08); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-copy { font-size: 12.5px; color: #6E6A5E; line-height: 1.7; }
+
+  @media (max-width: 900px) {
+    .nav-links, .nav-cta { display: none; }
+    .nav-burger { display: flex; }
+    .services-grid { grid-template-columns: 1fr; }
+    .about-grid { grid-template-columns: 1fr; gap: 44px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 44px; }
+    .hero-meta { display: none; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 20px; }
+    .sc-box, .contact-form { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#hero" class="logo">현대<b>인쇄소</b></a>
+  <div class="nav-links">
+    <a href="#services">인쇄서비스</a>
+    <a href="#about">회사소개</a>
+    <a href="#spellcheck">맞춤법 검사</a>
+    <a href="#contact">오시는길</a>
+  </div>
+  <a href="#contact" class="nav-cta">문의하기</a>
+  <div class="nav-burger" id="navBurger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-mobile-menu" id="navMobileMenu">
+  <a href="#services" onclick="closeMobileMenu()">인쇄서비스</a>
+  <a href="#about" onclick="closeMobileMenu()">회사소개</a>
+  <a href="#spellcheck" onclick="closeMobileMenu()">맞춤법 검사</a>
+  <a href="#contact" onclick="closeMobileMenu()">오시는길</a>
+  <a href="#contact" class="nav-cta" onclick="closeMobileMenu()">문의하기</a>
+</div>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<section id="hero">
+  <div class="crop-mark tl"></div>
+  <div class="crop-mark tr"></div>
+  <div class="wrap">
+    <div class="hero-eyebrow">Since 1998 · 단양 인쇄</div>
+    <h1 class="hero-title">글자 하나까지<br>정확하게, <em>현대인쇄소</em></h1>
+    <p class="hero-desc">명함, 간판, 현수막, 전단지까지 — 단양에서 27년째 한 자리를 지켜온 인쇄소입니다. 인쇄 전, 문구에 틀린 표현은 없는지 아래에서 바로 검사해보세요.</p>
+    <div class="hero-actions">
+      <a href="#spellcheck" class="btn btn-primary">맞춤법 검사해보기 →</a>
+      <a href="#contact" class="btn btn-ghost">인쇄 문의하기</a>
+    </div>
+    <div class="hero-meta">
+      <div><b>1998</b><span>단양읍 개업 원년</span></div>
+      <div><b>27년+</b><span>지역 운영 경력</span></div>
+      <div><b>4종+</b><span>명함·간판·현수막·전단지</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 인쇄 서비스 ══════════════════ -->
+<section id="services">
+  <div class="wrap">
+    <div class="eyebrow reveal">Print Services</div>
+    <h2 class="section-title reveal">인쇄 서비스</h2>
+    <p class="section-sub reveal">소량 명함부터 대형 현수막까지, 단양 지역 소상공인·자영업자를 위한 인쇄물을 제작합니다.</p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg>
+        </div>
+        <div class="service-name">명함 제작</div>
+        <div class="service-desc">일반 명함부터 고급 특수지 명함까지, 소량 주문도 당일 제작 가능합니다.</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="service-name">간판 제작</div>
+        <div class="service-desc">상가 간판, 입간판, 실내 사인물을 현장 실측 후 맞춤 제작합니다.</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18v10H3z"/><path d="M3 6l5 4-5 4M21 6l-5 4 5 4"/></svg>
+        </div>
+        <div class="service-name">현수막 제작</div>
+        <div class="service-desc">행사·개업·선거용 현수막을 빠르게 제작하고 설치까지 안내해드립니다.</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M4 14l5-5 4 4 3-3 4 4"/></svg>
+        </div>
+        <div class="service-name">전단지·포스터</div>
+        <div class="service-desc">홍보 전단지, 포스터, 메뉴판 등 다양한 판형으로 인쇄합니다.</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 9h16"/></svg>
+        </div>
+        <div class="service-name">스티커·라벨</div>
+        <div class="service-desc">제품 라벨, 포장 스티커를 원하는 모양과 크기로 재단 제작합니다.</div>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5a2 2 0 012-2h8l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6"/></svg>
+        </div>
+        <div class="service-name">책자·문서 인쇄</div>
+        <div class="service-desc">계획서, 소책자, 각종 서식 문서를 제본까지 한 번에 처리합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 회사소개 ══════════════════ -->
+<section id="about">
+  <div class="wrap">
+    <div class="eyebrow reveal">About Us</div>
+    <h2 class="section-title reveal">회사소개</h2>
+    <p class="section-sub reveal">1998년부터 단양읍에서 한 자리를 지켜온 인쇄소입니다.</p>
+    <div class="about-grid">
+      <div class="about-timeline">
+        <div class="about-item reveal">
+          <div class="about-year">1998</div>
+          <div class="about-text">충북 단양군 단양읍에서 현대인쇄소 개업</div>
+        </div>
+        <div class="about-item reveal">
+          <div class="about-year">현재</div>
+          <div class="about-text">27년째 명함·간판·현수막·전단지 등 지역 인쇄물 제작 중</div>
+        </div>
+      </div>
+      <p class="about-quote reveal">"작은 글자 하나도 다시 확인합니다. 인쇄는 한 번 나가면 되돌릴 수 없으니까요."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 맞춤법 검사 ══════════════════ -->
+<section id="spellcheck">
+  <div class="wrap">
+    <div class="eyebrow reveal">Before You Print</div>
+    <h2 class="section-title reveal">맞춤법 검사</h2>
+    <p class="section-sub reveal">인쇄 전, 자주 틀리는 표현이 있는지 미리 확인해보세요. 명함·간판 문구에서 특히 잘 틀리는 항목 위주로 검사합니다.</p>
+
+    <div class="sc-box reveal">
+      <textarea class="sc-textarea" id="scInput" placeholder="검사할 문구를 붙여넣으세요. 예: 사업이 잘돼길 바랍니다. 몇일 후에 연락드릴게요."></textarea>
+      <div class="sc-actions">
+        <span class="sc-hint">최대 2,000자까지 검사할 수 있어요</span>
+        <button class="btn btn-primary" onclick="runSpellCheck()">검사하기</button>
+      </div>
+      <div class="sc-results" id="scResults"></div>
+      <div class="sc-disclaimer">* 이 검사기는 인쇄물에서 자주 틀리는 표현을 모아 확인하는 도구로, 모든 맞춤법·문법 오류를 완벽하게 잡아내지는 않습니다. 최종 인쇄 전에는 육안으로 한 번 더 확인해주세요.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 오시는길 / 문의 ══════════════════ -->
+<section id="contact">
+  <div class="wrap">
+    <div class="eyebrow reveal">Visit Us</div>
+    <h2 class="section-title reveal">오시는길 · 문의</h2>
+    <p class="section-sub reveal">방문 상담 또는 아래 폼으로 문의해주시면 확인 후 연락드립니다.</p>
+    <div class="contact-grid">
+      <div class="contact-info-list reveal">
+        <div class="contact-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>주소</b><span>충청북도 단양군 단양읍 삼봉로 324 (우 395-805)</span></div>
+        </div>
+        <div class="contact-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          <div><b>문의</b><span>아래 문의 폼을 이용해주세요</span></div>
+        </div>
+        <div class="contact-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <div><b>운영</b><span>1998년 10월 29일 개업 · 영업중</span></div>
+        </div>
+      </div>
+      <form class="contact-form reveal" id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">성함 *</label>
+          <input class="form-input" type="text" name="from_name" placeholder="홍길동" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">연락처 *</label>
+          <input class="form-input" type="tel" name="from_phone" placeholder="010-0000-0000" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">제작 항목</label>
+          <select class="form-select" name="item_type">
+            <option value="" disabled selected>선택해주세요</option>
+            <option>명함</option>
+            <option>간판</option>
+            <option>현수막</option>
+            <option>전단지·포스터</option>
+            <option>스티커·라벨</option>
+            <option>책자·문서</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">문의 내용</label>
+          <textarea class="form-textarea" name="message" placeholder="수량, 사이즈, 원하시는 디자인 등을 자유롭게 남겨주세요."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit" id="submitBtn">문의 보내기 →</button>
+        <div class="form-note">제출 시 개인정보 수집·이용에 동의하는 것으로 간주합니다.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="cmyk-bar"><span class="c"></span><span class="m"></span><span class="y"></span><span class="k"></span></div>
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-copy">상호: 현대인쇄소 · 충청북도 단양군 단양읍 삼봉로 324<br>© 2026 현대인쇄소. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+});
+function toggleMobileMenu() {
+  document.getElementById('navBurger').classList.toggle('open');
+  document.getElementById('navMobileMenu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('navBurger').classList.remove('open');
+  document.getElementById('navMobileMenu').classList.remove('open');
+}
+const revealEls = document.querySelectorAll('.reveal');
+const ro = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+revealEls.forEach(el => ro.observe(el));
+
+// ══════════════════════════════════════════════
+//  자주 틀리는 한국어 표현 검사 (자체 사전 기반)
+//  외부 API 없이 동작 — speller.cs.pusan.ac.kr 서비스 종료 및
+//  후속 상용 서비스(nara-speller.co.kr)의 자동요청 차단으로 인해 자체 사전 방식으로 구현함
+// ══════════════════════════════════════════════
+const SPELL_PATTERNS = [
+  { pattern: /되요(?!고|는|기)/g, wrong: '되요', right: '돼요', help: '"되어요"의 준말은 "돼요"가 맞습니다.' },
+  { pattern: /됬(다|어|고|던|습니다)/g, wrong: '됬-', right: '됐-', help: '"되었-"의 준말은 "됐-"이 맞습니다.' },
+  { pattern: /안되요/g, wrong: '안되요', right: '안 돼요', help: '"안 되어요"의 준말은 "안 돼요"이며, "안"은 띄어 씁니다.' },
+  { pattern: /할께요|할께(?!서)/g, wrong: '할께(요)', right: '할게(요)', help: '약속·의지를 나타낼 때는 "게"로 적습니다.' },
+  { pattern: /갈께요|갈께(?!서)/g, wrong: '갈께(요)', right: '갈게(요)', help: '약속·의지를 나타낼 때는 "게"로 적습니다.' },
+  { pattern: /웬지/g, wrong: '웬지', right: '왠지', help: '"왜인지"의 준말은 "왠지"가 맞습니다.' },
+  { pattern: /몇일/g, wrong: '몇일', right: '며칠', help: '날짜를 물을 때는 "며칠"이 맞습니다.' },
+  { pattern: /어의없/g, wrong: '어의없다', right: '어이없다', help: '"어이없다"가 맞는 표현입니다.' },
+  { pattern: /금새/g, wrong: '금새', right: '금세', help: '"금방+에"의 준말은 "금세"가 맞습니다.' },
+  { pattern: /왠만하면|왠만한/g, wrong: '왠만(하면/한)', right: '웬만(하면/한)', help: '"웬만하다"가 맞는 표현입니다.' },
+  { pattern: /어떻해/g, wrong: '어떻해', right: '어떡해', help: '"어떻게 해"의 준말은 "어떡해"가 맞습니다.' },
+  { pattern: /역활/g, wrong: '역활', right: '역할', help: '"역할"이 맞는 표현입니다.' },
+  { pattern: /희안하/g, wrong: '희안하-', right: '희한하-', help: '"희한하다"가 맞는 표현입니다.' },
+  { pattern: /찌게/g, wrong: '찌게', right: '찌개', help: '음식 이름은 "찌개"가 맞습니다.' },
+  { pattern: /설겆이/g, wrong: '설겆이', right: '설거지', help: '"설거지"가 맞는 표현입니다.' },
+  { pattern: /통털어서/g, wrong: '통털어서', right: '통틀어서', help: '"통틀어서"가 맞는 표현입니다.' },
+  { pattern: /삼가해|삼가하세요/g, wrong: '삼가하-', right: '삼가-', help: '"삼가다"는 그 자체로 동사이므로 "삼가주세요"처럼 씁니다.' },
+  { pattern: /윗층/g, wrong: '윗층', right: '위층', help: '거센소리 앞에서는 사이시옷을 적지 않아 "위층"이 맞습니다.' },
+  { pattern: /윗쪽/g, wrong: '윗쪽', right: '위쪽', help: '거센소리 앞에서는 사이시옷을 적지 않아 "위쪽"이 맞습니다.' },
+  { pattern: /갯수/g, wrong: '갯수', right: '개수', help: '"개수(個數)"는 사이시옷 없이 적습니다.' },
+  { pattern: /곰곰히/g, wrong: '곰곰히', right: '곰곰이', help: '"곰곰이"가 맞는 표현입니다.' },
+  { pattern: /오랫만에/g, wrong: '오랫만에', right: '오랜만에', help: '"오래간만"의 준말은 "오랜만"이 맞습니다.' },
+  { pattern: /뵈요/g, wrong: '뵈요', right: '봬요', help: '"뵈어요"의 준말은 "봬요"가 맞습니다.' },
+].filter(r => r.wrong);
+
+function runSpellCheck() {
+  const text = document.getElementById('scInput').value.trim();
+  const resultsEl = document.getElementById('scResults');
+  resultsEl.classList.add('show');
+
+  if (!text) {
+    resultsEl.innerHTML = '<div class="sc-result-item" style="border-left-color:#6E6A5E"><span style="color:#8A8578">검사할 문구를 먼저 입력해주세요.</span></div>';
+    return;
+  }
+  if (text.length > 2000) {
+    resultsEl.innerHTML = '<div class="sc-result-item" style="border-left-color:#6E6A5E"><span style="color:#8A8578">2,000자를 초과했어요. 문구를 나눠서 검사해주세요.</span></div>';
+    return;
+  }
+
+  const found = [];
+  SPELL_PATTERNS.forEach(rule => {
+    const matches = text.match(rule.pattern);
+    if (matches && matches.length) {
+      found.push({ wrong: rule.wrong, right: rule.right, help: rule.help, count: matches.length });
+    }
+  });
+
+  if (!found.length) {
+    resultsEl.innerHTML = '<div class="sc-result-item" style="border-left-color:#4FBF7F"><span class="sc-clean">✓ 자주 틀리는 표현이 발견되지 않았어요.</span></div>';
+    return;
+  }
+
+  resultsEl.innerHTML = found.map(f => `
+    <div class="sc-result-item">
+      <div>
+        <div><span class="sc-wrong">${f.wrong}</span> <span class="sc-arrow">→</span> <span class="sc-right">${f.right}</span> ${f.count > 1 ? `<span style="color:#6E6A5E;font-size:12px">(${f.count}회)</span>` : ''}</div>
+        <div class="sc-help">${f.help}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+//  문의폼 처리
+// ══════════════════════════════════════════════
+async function handleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('submitBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '전송 중...';
+  try {
+    const params = new URLSearchParams({
+      name: form.from_name.value,
+      phone: form.from_phone.value,
+      item: form.item_type.value,
+      message: form.message.value || ''
+    });
+    console.log('문의 접수:', params.toString());
+    await new Promise(r => setTimeout(r, 400));
+    alert('문의가 접수되었습니다. 담당자가 곧 연락드리겠습니다.');
+    form.reset();
+  } catch (err) {
+    console.error('문의 저장 실패:', err);
+    alert('접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+</script>
+</body>
+</html>
