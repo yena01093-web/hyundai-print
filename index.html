@@ -104,6 +104,53 @@
   .about-text { font-size: 14.5px; color: #4B4A45; }
   .about-quote { font-size: 21px; line-height: 1.6; color: #16160F; font-weight: 700; border-left: 3px solid #E8483D; padding-left: 24px; }
 
+  /* ── Business card design preview ────────────────── */
+  #bizcard { background: #F7F6F3; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .bc-layout { display: grid; grid-template-columns: 380px 1fr; gap: 44px; margin-top: 48px; align-items: start; }
+  .bc-preview-wrap { position: sticky; top: 110px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .bc-card {
+    width: 100%; aspect-ratio: 1.8/1; border-radius: 10px; padding: 30px 32px;
+    display: flex; flex-direction: column; justify-content: center;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.14); font-family: 'Pretendard', sans-serif;
+    transition: background 0.25s;
+  }
+  .bc-name { font-size: 21px; font-weight: 800; }
+  .bc-title { font-size: 12.5px; font-weight: 600; margin-top: 3px; opacity: 0.75; }
+  .bc-company { font-size: 13px; font-weight: 700; margin-top: 14px; letter-spacing: 0.04em; }
+  .bc-contact { font-size: 11px; margin-top: 12px; line-height: 1.7; opacity: 0.8; }
+
+  .bc-card.tpl-minimal { background: #FFF; color: #16160F; border: 1px solid rgba(0,0,0,0.08); }
+  .bc-card.tpl-minimal .bc-name { border-bottom: 2px solid #E8483D; padding-bottom: 10px; display: inline-block; }
+
+  .bc-card.tpl-dark { background: #16160F; color: #F5F4F0; }
+  .bc-card.tpl-dark .bc-name { color: #FFF; }
+  .bc-card.tpl-dark .bc-company { color: #E8483D; }
+
+  .bc-card.tpl-block { background: #FFF; color: #16160F; flex-direction: row; align-items: stretch; padding: 0; }
+  .bc-card.tpl-block::before { content: ''; width: 34%; background: #E8483D; flex-shrink: 0; }
+  .bc-card.tpl-block .bc-text { flex: 1; padding: 30px 26px; display: flex; flex-direction: column; justify-content: center; }
+
+  .bc-card.tpl-border { background: #FFF; color: #16160F; border: 2px solid #16160F; align-items: center; text-align: center; }
+  .bc-card.tpl-border .bc-name { position: relative; }
+  .bc-card.tpl-border .bc-contact { border-top: 1px solid rgba(0,0,0,0.15); padding-top: 10px; }
+
+  .bc-tpl-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .bc-tpl-tab {
+    font-size: 12.5px; font-weight: 700; padding: 8px 16px; border-radius: 20px; cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.12); color: #6B6A62; background: #FFF; transition: all 0.15s;
+  }
+  .bc-tpl-tab.active { background: #16160F; color: #FFF; border-color: #16160F; }
+
+  .bc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bc-form-grid .form-group.full { grid-column: 1 / -1; }
+  @media (max-width: 900px) {
+    .bc-layout { grid-template-columns: 1fr; }
+    .bc-preview-wrap { position: static; }
+  }
+  @media (max-width: 560px) {
+    .bc-form-grid { grid-template-columns: 1fr; }
+  }
+
   /* ── Spellcheck tool ─────────────────────────────── */
   #spellcheck { background: #F7F6F3; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06); }
   .sc-box { background: #FFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; padding: 32px; margin-top: 48px; box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
@@ -195,6 +242,7 @@
   <div class="nav-links">
     <a href="#services">인쇄서비스</a>
     <a href="#about">회사소개</a>
+    <a href="#bizcard">명함 디자인</a>
     <a href="#spellcheck">맞춤법 검사</a>
     <a href="#compare">원고 대조</a>
     <a href="#contact">오시는길</a>
@@ -206,6 +254,7 @@
 <div class="nav-mobile-menu" id="navMobileMenu">
   <a href="#services" onclick="closeMobileMenu()">인쇄서비스</a>
   <a href="#about" onclick="closeMobileMenu()">회사소개</a>
+  <a href="#bizcard" onclick="closeMobileMenu()">명함 디자인</a>
   <a href="#spellcheck" onclick="closeMobileMenu()">맞춤법 검사</a>
   <a href="#compare" onclick="closeMobileMenu()">원고 대조</a>
   <a href="#contact" onclick="closeMobileMenu()">오시는길</a>
@@ -303,6 +352,63 @@
         </div>
       </div>
       <p class="about-quote reveal">"작은 글자 하나도 다시 확인합니다. 인쇄는 한 번 나가면 되돌릴 수 없으니까요."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 명함 디자인 미리보기 ══════════════════ -->
+<section id="bizcard">
+  <div class="wrap">
+    <div class="eyebrow reveal">Design Preview</div>
+    <h2 class="section-title reveal">명함 디자인 미리보기</h2>
+    <p class="section-sub reveal">정보를 입력하면 몇 가지 스타일로 실시간 미리보기가 됩니다. 마음에 드는 방향을 골라 방문·문의 시 말씀해주시면 그대로 제작해드려요.</p>
+
+    <div class="bc-layout reveal">
+      <div class="bc-preview-wrap">
+        <div class="bc-card tpl-minimal" id="bcCard">
+          <div class="bc-text">
+            <div class="bc-name" id="bcName">홍길동</div>
+            <div class="bc-title" id="bcTitle">대표</div>
+            <div class="bc-company" id="bcCompany">현대인쇄소</div>
+            <div class="bc-contact">
+              <div id="bcPhone">010-0000-0000</div>
+              <div id="bcAddress">충청북도 단양군 단양읍 삼봉로 324</div>
+            </div>
+          </div>
+        </div>
+        <div class="bc-tpl-tabs">
+          <div class="bc-tpl-tab active" onclick="setBcTemplate('minimal', this)">미니멀</div>
+          <div class="bc-tpl-tab" onclick="setBcTemplate('dark', this)">다크</div>
+          <div class="bc-tpl-tab" onclick="setBcTemplate('block', this)">레드블록</div>
+          <div class="bc-tpl-tab" onclick="setBcTemplate('border', this)">보더</div>
+        </div>
+      </div>
+
+      <div class="sc-box" style="margin-top:0">
+        <div class="bc-form-grid">
+          <div class="form-group">
+            <label class="form-label">이름</label>
+            <input class="form-input" id="bcInputName" value="홍길동" oninput="updateBcPreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">직함</label>
+            <input class="form-input" id="bcInputTitle" value="대표" oninput="updateBcPreview()">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">회사명</label>
+            <input class="form-input" id="bcInputCompany" value="현대인쇄소" oninput="updateBcPreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">연락처</label>
+            <input class="form-input" id="bcInputPhone" value="010-0000-0000" oninput="updateBcPreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">주소</label>
+            <input class="form-input" id="bcInputAddress" value="충청북도 단양군 단양읍 삼봉로 324" oninput="updateBcPreview()">
+          </div>
+        </div>
+        <div class="sc-disclaimer">* 실제 인쇄 파일은 지질·색상·재단 여백 등을 고려해 별도로 제작합니다. 이 미리보기는 방향을 잡기 위한 참고용입니다.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -440,6 +546,24 @@ const ro = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
 }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 revealEls.forEach(el => ro.observe(el));
+
+// ══════════════════════════════════════════════
+//  명함 디자인 실시간 미리보기 (템플릿 기반, 서버/API 없음)
+// ══════════════════════════════════════════════
+function setBcTemplate(name, el) {
+  const card = document.getElementById('bcCard');
+  card.className = 'bc-card tpl-' + name;
+  document.querySelectorAll('.bc-tpl-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateBcPreview() {
+  document.getElementById('bcName').textContent = document.getElementById('bcInputName').value || '홍길동';
+  document.getElementById('bcTitle').textContent = document.getElementById('bcInputTitle').value || '';
+  document.getElementById('bcCompany').textContent = document.getElementById('bcInputCompany').value || '';
+  document.getElementById('bcPhone').textContent = document.getElementById('bcInputPhone').value || '';
+  document.getElementById('bcAddress').textContent = document.getElementById('bcInputAddress').value || '';
+}
 
 // ══════════════════════════════════════════════
 //  자주 틀리는 한국어 표현 검사 (자체 사전 기반)
