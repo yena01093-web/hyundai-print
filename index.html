@@ -7,6 +7,7 @@
 <meta name="description" content="충북 단양군 단양읍 현대인쇄소. 1998년부터 명함, 간판, 현수막, 전단지, 스티커 등 인쇄물을 제작합니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Zilla+Slab:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -131,7 +132,17 @@
 
   /* ── Compare tool ────────────────────────────────── */
   .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .cmp-col-label { font-size: 12.5px; font-weight: 700; color: #8A8578; margin-bottom: 8px; display: block; }
+  .cmp-col-label { font-size: 12.5px; font-weight: 700; color: #8A8578; }
+  .cmp-col-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap; }
+  .cmp-ocr-btn {
+    font-size: 12px; font-weight: 600; color: #C23B32; border: 1px solid rgba(194,59,50,0.35); border-radius: 20px;
+    padding: 5px 12px; cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  }
+  .cmp-ocr-btn:hover { background: rgba(194,59,50,0.1); }
+  .cmp-ocr-status { font-size: 12px; color: #8A8578; margin-top: 6px; min-height: 16px; }
+  .cmp-ocr-status.loading { color: #C9A227; }
+  .cmp-ocr-status.done { color: #4FBF7F; }
+  .cmp-ocr-status.error { color: #C23B32; }
   .cmp-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 12px; }
   .cmp-result { margin-top: 24px; display: none; }
   .cmp-result.show { display: block; }
@@ -323,17 +334,25 @@
   <div class="wrap">
     <div class="eyebrow reveal">Proofreading</div>
     <h2 class="section-title reveal">원고 대조</h2>
-    <p class="section-sub reveal">고객이 보낸 원본 내용과 실제 제작한 내용이 정확히 일치하는지 글자 단위로 비교합니다. 파일 형식과 상관없이 내용만 복사해서 붙여넣으면 됩니다.</p>
+    <p class="section-sub reveal">고객이 보낸 원본 내용과 실제 제작한 내용이 정확히 일치하는지 글자 단위로 비교합니다. 텍스트를 붙여넣거나, 스캔·사진 이미지에서 글자를 추출해서 채울 수 있어요.</p>
 
     <div class="sc-box reveal">
       <div class="cmp-grid">
         <div>
-          <span class="cmp-col-label">원본 (고객이 보낸 내용)</span>
-          <textarea class="sc-textarea" id="cmpOriginal" placeholder="고객에게 받은 원본 문구를 붙여넣으세요."></textarea>
+          <div class="cmp-col-head">
+            <span class="cmp-col-label">원본 (고객이 보낸 내용)</span>
+            <label class="cmp-ocr-btn">📷 이미지에서 추출<input type="file" accept="image/*" style="display:none" onchange="runOCR(this, 'cmpOriginal')"></label>
+          </div>
+          <textarea class="sc-textarea" id="cmpOriginal" placeholder="고객에게 받은 원본 문구를 붙여넣거나, 이미지에서 추출하세요."></textarea>
+          <div class="cmp-ocr-status" id="cmpOriginalStatus"></div>
         </div>
         <div>
-          <span class="cmp-col-label">제작본 (실제 입력한 내용)</span>
-          <textarea class="sc-textarea" id="cmpProduced" placeholder="디자인/인쇄용으로 직접 입력한 문구를 붙여넣으세요."></textarea>
+          <div class="cmp-col-head">
+            <span class="cmp-col-label">제작본 (실제 입력한 내용)</span>
+            <label class="cmp-ocr-btn">📷 이미지에서 추출<input type="file" accept="image/*" style="display:none" onchange="runOCR(this, 'cmpProduced')"></label>
+          </div>
+          <textarea class="sc-textarea" id="cmpProduced" placeholder="디자인/인쇄용으로 직접 입력한 문구를 붙여넣거나, 이미지에서 추출하세요."></textarea>
+          <div class="cmp-ocr-status" id="cmpProducedStatus"></div>
         </div>
       </div>
       <div class="cmp-actions">
@@ -341,7 +360,7 @@
         <button class="btn btn-primary" onclick="runCompare()">대조하기</button>
       </div>
       <div class="cmp-result" id="cmpResult"></div>
-      <div class="sc-disclaimer">* 빨간 취소선은 원본에는 있지만 제작본에 없는(빠졌거나 바뀐) 글자, 초록 밑줄은 제작본에만 있는(추가되거나 바뀐) 글자입니다.</div>
+      <div class="sc-disclaimer">* 빨간 취소선은 원본에는 있지만 제작본에 없는(빠졌거나 바뀐) 글자, 초록 밑줄은 제작본에만 있는(추가되거나 바뀐) 글자입니다.<br>* 이미지 텍스트 추출(OCR)은 사진·스캔 이미지 파일만 지원합니다. PDF는 화면 캡처(스크린샷)해서 이미지로 저장한 뒤 업로드해주세요. 글씨체나 화질에 따라 인식이 완벽하지 않을 수 있으니, 추출된 내용은 대조 전에 한 번 확인해주세요.</div>
     </div>
   </div>
 </section>
@@ -521,6 +540,46 @@ function diffChars(a, b) {
 
 function escHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ══════════════════════════════════════════════
+//  이미지 텍스트 추출 (OCR, Tesseract.js — 브라우저 자체 실행)
+// ══════════════════════════════════════════════
+let ocrWorker = null;
+
+async function getOcrWorker() {
+  if (!ocrWorker) {
+    ocrWorker = await Tesseract.createWorker('kor');
+  }
+  return ocrWorker;
+}
+
+async function runOCR(input, targetId) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById(targetId + 'Status');
+  statusEl.textContent = '텍스트 인식 중... (최초 1회는 시간이 더 걸려요)';
+  statusEl.className = 'cmp-ocr-status loading';
+
+  try {
+    const worker = await getOcrWorker();
+    const { data } = await worker.recognize(file);
+    const text = (data.text || '').trim();
+    if (!text) {
+      statusEl.textContent = '글자를 인식하지 못했어요. 더 선명한 이미지로 다시 시도해주세요.';
+      statusEl.className = 'cmp-ocr-status error';
+      return;
+    }
+    document.getElementById(targetId).value = text;
+    statusEl.textContent = '✓ 텍스트를 추출했어요. 내용을 확인해주세요.';
+    statusEl.className = 'cmp-ocr-status done';
+  } catch (err) {
+    console.error('OCR 실패:', err);
+    statusEl.textContent = '텍스트 추출 중 오류가 발생했어요. 다시 시도해주세요.';
+    statusEl.className = 'cmp-ocr-status error';
+  } finally {
+    input.value = '';
+  }
 }
 
 function runCompare() {
