@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포트폴리오 관리자 | 현대인쇄소</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F7F6F3; color: #1A1A18;
+    font-family: 'Pretendard', -apple-system, 'Malgun Gothic', sans-serif;
+    line-height: 1.6; min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 60px 24px 100px; }
+  a { color: inherit; }
+
+  .top-link { font-size: 13px; color: #6B6A62; font-weight: 600; }
+  .top-link:hover { color: #E8483D; }
+  h1 { font-size: 26px; font-weight: 800; margin-top: 18px; letter-spacing: -0.01em; }
+  .sub { font-size: 14px; color: #6B6A62; margin-top: 8px; }
+
+  /* ── Password gate ── */
+  #gate { max-width: 360px; margin: 100px auto; text-align: center; }
+  #gate h2 { font-size: 19px; font-weight: 800; margin-bottom: 18px; }
+  #gate input {
+    width: 100%; padding: 13px 16px; border: 1px solid rgba(0,0,0,0.12); border-radius: 8px;
+    font-size: 15px; text-align: center; margin-bottom: 12px;
+  }
+  #gate input:focus { outline: none; border-color: #E8483D; }
+  #gate button {
+    width: 100%; padding: 13px; background: #1A1A18; color: #FFF; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  #gate button:hover { background: #E8483D; }
+  #gateError { color: #E8483D; font-size: 13px; margin-top: 10px; display: none; }
+
+  #app { display: none; }
+
+  .panel { background: #FFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; padding: 28px; margin-top: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
+  .panel-title { font-size: 15px; font-weight: 800; margin-bottom: 18px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12.5px; color: #6B6A62; margin-bottom: 6px; display: block; font-weight: 600; }
+  .form-input, .form-select {
+    width: 100%; padding: 12px 14px; background: #F7F6F3; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px;
+    color: #1A1A18; font-size: 14.5px; font-family: inherit;
+  }
+  .form-input:focus, .form-select:focus { outline: none; border-color: #E8483D; }
+  .preview-box { margin-top: 12px; display: none; }
+  .preview-box img { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; width: 100%; justify-content: center; }
+  .btn-primary { background: #E8483D; color: #FFF; }
+  .btn-primary:hover { background: #D63A2F; }
+  .btn-primary:disabled { background: #C9C7C0; cursor: not-allowed; }
+
+  .item-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .item-row { display: flex; align-items: center; gap: 14px; background: #F7F6F3; border-radius: 8px; padding: 10px; }
+  .item-row img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-title { font-size: 13.5px; font-weight: 700; }
+  .item-cat { font-size: 11.5px; color: #6B6A62; }
+  .item-del { background: none; border: 1px solid rgba(232,72,61,0.3); color: #E8483D; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .item-del:hover { background: rgba(232,72,61,0.08); }
+  .empty-note { font-size: 13px; color: #8B8A80; text-align: center; padding: 24px; }
+
+  .notice { font-size: 12.5px; color: #8B8A80; line-height: 1.7; margin-top: 20px; padding: 14px 16px; background: #FFF9E8; border: 1px solid #F0DFA0; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div id="gate">
+    <h2>🔒 포트폴리오 관리자</h2>
+    <input type="password" id="pwInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button onclick="checkPassword()">입장</button>
+    <div id="gateError">비밀번호가 올바르지 않습니다.</div>
+  </div>
+
+  <div id="app">
+    <a href="index.html" class="top-link">← 홈페이지로 돌아가기</a>
+    <h1>포트폴리오 관리</h1>
+    <p class="sub">작업물 사진을 추가·삭제하면 홈페이지 포트폴리오 섹션에 반영됩니다.</p>
+
+    <div class="panel">
+      <div class="panel-title">새 작업물 추가</div>
+      <div class="form-group">
+        <label class="form-label">사진</label>
+        <input type="file" class="form-input" id="fileInput" accept="image/*" onchange="previewFile(this)">
+        <div class="preview-box" id="previewBox"><img id="previewImg" src=""></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">제목/설명</label>
+        <input type="text" class="form-input" id="titleInput" placeholder="예: OO식당 개업 명함">
+      </div>
+      <div class="form-group">
+        <label class="form-label">분류</label>
+        <select class="form-select" id="catInput">
+          <option>명함</option>
+          <option>간판</option>
+          <option>현수막</option>
+          <option>전단지·포스터</option>
+          <option>스티커·라벨</option>
+          <option>기타</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="addBtn" onclick="addItem()">포트폴리오에 추가</button>
+      <div class="notice">⚠ 현재는 이 브라우저에만 저장되는 임시 상태입니다 (Firebase 연동 전). 다른 기기·다른 방문자에게는 아직 보이지 않아요. 실제 서비스 연동은 별도로 준비 중입니다.</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">등록된 작업물</div>
+      <div class="item-list" id="itemList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PW = '0000'; // TODO: 실제 운영 시 원하는 비밀번호로 변경하세요.
+
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === ADMIN_PW) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderItemList();
+  } else {
+    document.getElementById('gateError').style.display = 'block';
+  }
+}
+
+let pendingDataUrl = null;
+
+function previewFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      // 클수록 localStorage 용량을 많이 차지하므로 최대 900px로 축소
+      const maxDim = 900;
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      pendingDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      document.getElementById('previewImg').src = pendingDataUrl;
+      document.getElementById('previewBox').style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getItems() {
+  try { return JSON.parse(localStorage.getItem('portfolioItems') || '[]'); } catch (e) { return []; }
+}
+function saveItems(items) {
+  localStorage.setItem('portfolioItems', JSON.stringify(items));
+}
+
+function addItem() {
+  if (!pendingDataUrl) { alert('사진을 먼저 선택해주세요.'); return; }
+  const title = document.getElementById('titleInput').value.trim();
+  const category = document.getElementById('catInput').value;
+  const items = getItems();
+  items.push({
+    id: 'p_' + Date.now(),
+    title: title || category,
+    category,
+    dataUrl: pendingDataUrl,
+    createdAt: Date.now()
+  });
+  try {
+    saveItems(items);
+  } catch (e) {
+    alert('저장 공간이 부족해요. 오래된 항목을 삭제한 뒤 다시 시도해주세요.');
+    return;
+  }
+  pendingDataUrl = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('titleInput').value = '';
+  document.getElementById('previewBox').style.display = 'none';
+  renderItemList();
+}
+
+function deleteItem(id) {
+  if (!confirm('삭제하시겠어요?')) return;
+  const items = getItems().filter(i => i.id !== id);
+  saveItems(items);
+  renderItemList();
+}
+
+function renderItemList() {
+  const list = document.getElementById('itemList');
+  const items = getItems().slice().reverse();
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-note">등록된 작업물이 없어요.</div>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="item-row">
+      <img src="${item.dataUrl}" alt="">
+      <div class="item-info">
+        <div class="item-title">${item.title}</div>
+        <div class="item-cat">${item.category}</div>
+      </div>
+      <button class="item-del" onclick="deleteItem('${item.id}')">삭제</button>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

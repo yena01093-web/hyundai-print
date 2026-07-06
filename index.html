@@ -104,6 +104,30 @@
   .about-text { font-size: 14.5px; color: #4B4A45; }
   .about-quote { font-size: 21px; line-height: 1.6; color: #16160F; font-weight: 700; border-left: 3px solid #E8483D; padding-left: 24px; }
 
+  /* ── Portfolio gallery ────────────────────────────── */
+  .portfolio-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 48px; }
+  .portfolio-item { position: relative; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #F7F6F3; border: 1px solid rgba(0,0,0,0.07); cursor: pointer; }
+  .portfolio-item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .portfolio-overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, transparent 60%); opacity: 0; transition: opacity 0.2s;
+  }
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-name { font-size: 12.5px; font-weight: 700; color: #FFF; }
+  .portfolio-empty {
+    grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #8B8A80; font-size: 14px;
+    border: 1.5px dashed rgba(0,0,0,0.12); border-radius: 12px;
+  }
+  @media (max-width: 900px) { .portfolio-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .portfolio-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ── Lightbox (portfolio) ─────────────────────────── */
+  .lightbox { position: fixed; inset: 0; z-index: 500; background: rgba(20,19,17,0.92); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out; }
+  .lightbox.visible { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 82vh; max-height: 82dvh; object-fit: contain; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .lightbox-caption { position: absolute; bottom: 32px; left: 0; right: 0; text-align: center; color: #FFF; font-size: 15px; font-weight: 700; }
+  .lightbox-close { position: absolute; top: 24px; right: 32px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.12); color: #FFF; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
   /* ── Business card design preview ────────────────── */
   #bizcard { background: #F7F6F3; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06); }
   .bc-layout { display: grid; grid-template-columns: 380px 1fr; gap: 44px; margin-top: 48px; align-items: start; }
@@ -242,6 +266,7 @@
   <div class="nav-links">
     <a href="#services">인쇄서비스</a>
     <a href="#about">회사소개</a>
+    <a href="#portfolio">포트폴리오</a>
     <a href="#bizcard">명함 디자인</a>
     <a href="#spellcheck">맞춤법 검사</a>
     <a href="#compare">원고 대조</a>
@@ -254,6 +279,7 @@
 <div class="nav-mobile-menu" id="navMobileMenu">
   <a href="#services" onclick="closeMobileMenu()">인쇄서비스</a>
   <a href="#about" onclick="closeMobileMenu()">회사소개</a>
+  <a href="#portfolio" onclick="closeMobileMenu()">포트폴리오</a>
   <a href="#bizcard" onclick="closeMobileMenu()">명함 디자인</a>
   <a href="#spellcheck" onclick="closeMobileMenu()">맞춤법 검사</a>
   <a href="#compare" onclick="closeMobileMenu()">원고 대조</a>
@@ -353,6 +379,20 @@
       </div>
       <p class="about-quote reveal">"작은 글자 하나도 다시 확인합니다. 인쇄는 한 번 나가면 되돌릴 수 없으니까요."</p>
     </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 포트폴리오 ══════════════════
+     admin.html에서 등록한 작업물이 여기 표시됩니다.
+     (현재는 브라우저 localStorage 기반 임시 저장 — Firebase 연동 후에는 이 브라우저뿐 아니라
+     모든 방문자에게 보이도록 자동 전환 예정)
+-->
+<section id="portfolio">
+  <div class="wrap">
+    <div class="eyebrow reveal">Our Work</div>
+    <h2 class="section-title reveal">포트폴리오</h2>
+    <p class="section-sub reveal">그동안 제작한 명함·간판·현수막 작업물입니다.</p>
+    <div class="portfolio-grid" id="portfolioGrid"></div>
   </div>
 </section>
 
@@ -522,10 +562,18 @@
   </div>
 </section>
 
+<!-- ── 포트폴리오 사진 확대 보기 ── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
 <div class="cmyk-bar"><span class="c"></span><span class="m"></span><span class="y"></span><span class="k"></span></div>
 <footer>
   <div class="wrap footer-inner">
     <div class="footer-copy">상호: 현대인쇄소 · 충청북도 단양군 단양읍 삼봉로 324<br>© 2026 현대인쇄소. All rights reserved.</div>
+    <a href="admin.html" style="font-size:12px;color:#C9C7C0">직원용</a>
   </div>
 </footer>
 
@@ -564,6 +612,48 @@ function updateBcPreview() {
   document.getElementById('bcPhone').textContent = document.getElementById('bcInputPhone').value || '';
   document.getElementById('bcAddress').textContent = document.getElementById('bcInputAddress').value || '';
 }
+
+// ══════════════════════════════════════════════
+//  포트폴리오 (임시: localStorage / 예정: Firebase Firestore+Storage)
+//  admin.html에서 등록하면 'portfolioItems' 키에 저장됨.
+//  Firebase 연동 후에는 이 부분을 db.collection('portfolio').onSnapshot(...)으로 교체하면
+//  모든 방문자에게 실시간으로 보이게 됩니다.
+// ══════════════════════════════════════════════
+function renderPortfolio() {
+  const grid = document.getElementById('portfolioGrid');
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('portfolioItems') || '[]'); } catch (e) { items = []; }
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="portfolio-empty">아직 등록된 포트폴리오가 없어요.<br>관리자 페이지(admin.html)에서 추가할 수 있어요.</div>';
+    return;
+  }
+
+  grid.innerHTML = items.slice().reverse().map(item => `
+    <div class="portfolio-item" onclick="openLightbox('${item.id}')">
+      <img src="${item.dataUrl}" alt="${escHtml(item.title || '')}">
+      <div class="portfolio-overlay"><div class="portfolio-name">${escHtml(item.title || '')}</div></div>
+    </div>
+  `).join('');
+}
+
+function openLightbox(id) {
+  let items = [];
+  try { items = JSON.parse(localStorage.getItem('portfolioItems') || '[]'); } catch (e) { items = []; }
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('lightboxImg').src = item.dataUrl;
+  document.getElementById('lightboxCaption').textContent = item.title || '';
+  document.getElementById('lightbox').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+renderPortfolio();
 
 // ══════════════════════════════════════════════
 //  자주 틀리는 한국어 표현 검사 (자체 사전 기반)
