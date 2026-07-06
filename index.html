@@ -129,6 +129,20 @@
   .sc-clean { color: #4FBF7F; font-weight: 600; font-size: 14.5px; }
   .sc-disclaimer { font-size: 12px; color: #6E6A5E; margin-top: 20px; line-height: 1.7; }
 
+  /* ── Compare tool ────────────────────────────────── */
+  .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .cmp-col-label { font-size: 12.5px; font-weight: 700; color: #8A8578; margin-bottom: 8px; display: block; }
+  .cmp-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; flex-wrap: wrap; gap: 12px; }
+  .cmp-result { margin-top: 24px; display: none; }
+  .cmp-result.show { display: block; }
+  .cmp-summary { font-size: 14.5px; font-weight: 700; margin-bottom: 14px; }
+  .cmp-summary.clean { color: #4FBF7F; }
+  .cmp-summary.diff { color: #C23B32; }
+  .cmp-diff-box { background: #262420; border-radius: 8px; padding: 18px 20px; font-size: 15px; line-height: 2; word-break: break-all; }
+  .cmp-removed { color: #C23B32; text-decoration: line-through; background: rgba(194,59,50,0.12); border-radius: 3px; padding: 0 2px; }
+  .cmp-added { color: #4FBF7F; text-decoration: underline; background: rgba(79,191,127,0.12); border-radius: 3px; padding: 0 2px; }
+  @media (max-width: 700px) { .cmp-grid { grid-template-columns: 1fr; } }
+
   /* ── Location / contact ──────────────────────────── */
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; }
   .contact-info-list { display: flex; flex-direction: column; gap: 20px; }
@@ -174,6 +188,7 @@
     <a href="#services">인쇄서비스</a>
     <a href="#about">회사소개</a>
     <a href="#spellcheck">맞춤법 검사</a>
+    <a href="#compare">원고 대조</a>
     <a href="#contact">오시는길</a>
   </div>
   <a href="#contact" class="nav-cta">문의하기</a>
@@ -184,6 +199,7 @@
   <a href="#services" onclick="closeMobileMenu()">인쇄서비스</a>
   <a href="#about" onclick="closeMobileMenu()">회사소개</a>
   <a href="#spellcheck" onclick="closeMobileMenu()">맞춤법 검사</a>
+  <a href="#compare" onclick="closeMobileMenu()">원고 대조</a>
   <a href="#contact" onclick="closeMobileMenu()">오시는길</a>
   <a href="#contact" class="nav-cta" onclick="closeMobileMenu()">문의하기</a>
 </div>
@@ -298,6 +314,34 @@
       </div>
       <div class="sc-results" id="scResults"></div>
       <div class="sc-disclaimer">* 이 검사기는 인쇄물에서 자주 틀리는 표현을 모아 확인하는 도구로, 모든 맞춤법·문법 오류를 완벽하게 잡아내지는 않습니다. 최종 인쇄 전에는 육안으로 한 번 더 확인해주세요.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 원고 대조 ══════════════════ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="eyebrow reveal">Proofreading</div>
+    <h2 class="section-title reveal">원고 대조</h2>
+    <p class="section-sub reveal">고객이 보낸 원본 내용과 실제 제작한 내용이 정확히 일치하는지 글자 단위로 비교합니다. 파일 형식과 상관없이 내용만 복사해서 붙여넣으면 됩니다.</p>
+
+    <div class="sc-box reveal">
+      <div class="cmp-grid">
+        <div>
+          <span class="cmp-col-label">원본 (고객이 보낸 내용)</span>
+          <textarea class="sc-textarea" id="cmpOriginal" placeholder="고객에게 받은 원본 문구를 붙여넣으세요."></textarea>
+        </div>
+        <div>
+          <span class="cmp-col-label">제작본 (실제 입력한 내용)</span>
+          <textarea class="sc-textarea" id="cmpProduced" placeholder="디자인/인쇄용으로 직접 입력한 문구를 붙여넣으세요."></textarea>
+        </div>
+      </div>
+      <div class="cmp-actions">
+        <span class="sc-hint">각 2,000자까지 대조할 수 있어요</span>
+        <button class="btn btn-primary" onclick="runCompare()">대조하기</button>
+      </div>
+      <div class="cmp-result" id="cmpResult"></div>
+      <div class="sc-disclaimer">* 빨간 취소선은 원본에는 있지만 제작본에 없는(빠졌거나 바뀐) 글자, 초록 밑줄은 제작본에만 있는(추가되거나 바뀐) 글자입니다.</div>
     </div>
   </div>
 </section>
@@ -452,6 +496,67 @@ function runSpellCheck() {
 // ══════════════════════════════════════════════
 //  문의폼 처리
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  원고 대조 (글자 단위 diff, LCS 기반)
+// ══════════════════════════════════════════════
+function diffChars(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  const ops = [];
+  let i = m, j = n;
+  while (i > 0 && j > 0) {
+    if (a[i - 1] === b[j - 1]) { ops.push({ type: 'same', ch: a[i - 1] }); i--; j--; }
+    else if (dp[i - 1][j] >= dp[i][j - 1]) { ops.push({ type: 'removed', ch: a[i - 1] }); i--; }
+    else { ops.push({ type: 'added', ch: b[j - 1] }); j--; }
+  }
+  while (i > 0) { ops.push({ type: 'removed', ch: a[i - 1] }); i--; }
+  while (j > 0) { ops.push({ type: 'added', ch: b[j - 1] }); j--; }
+  return ops.reverse();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function runCompare() {
+  const original = document.getElementById('cmpOriginal').value.trim();
+  const produced = document.getElementById('cmpProduced').value.trim();
+  const resultEl = document.getElementById('cmpResult');
+  resultEl.classList.add('show');
+
+  if (!original || !produced) {
+    resultEl.innerHTML = '<div class="cmp-summary diff">원본과 제작본을 모두 입력해주세요.</div>';
+    return;
+  }
+  if (original.length > 2000 || produced.length > 2000) {
+    resultEl.innerHTML = '<div class="cmp-summary diff">2,000자를 초과했어요. 문구를 나눠서 대조해주세요.</div>';
+    return;
+  }
+  if (original === produced) {
+    resultEl.innerHTML = '<div class="cmp-summary clean">✓ 원본과 제작본이 완전히 일치합니다.</div>';
+    return;
+  }
+
+  const ops = diffChars(original, produced);
+  let diffCount = 0;
+  const html = ops.map(op => {
+    if (op.type === 'same') return escHtml(op.ch);
+    diffCount++;
+    if (op.type === 'removed') return `<span class="cmp-removed">${escHtml(op.ch)}</span>`;
+    return `<span class="cmp-added">${escHtml(op.ch)}</span>`;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <div class="cmp-summary diff">⚠ 차이가 있는 부분이 발견됐어요 (${diffCount}곳)</div>
+    <div class="cmp-diff-box">${html}</div>
+  `;
+}
+
 async function handleSubmit(e) {
   e.preventDefault();
   const form = e.target;
